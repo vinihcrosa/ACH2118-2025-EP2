@@ -20,6 +20,17 @@
       }
     },
     {
+      "name": "fasttext_100d",
+      "class": "FastTextVectorizer",
+      "params": {
+        "vector_size": 100,
+        "window": 5,
+        "min_count": 2,
+        "workers": 4,
+        "epochs": 50
+      }
+    },
+    {
       "name": "word2vec_200d",
       "class": "Word2VecVectorizer",
       "params": {

@@ -10,6 +10,7 @@ from sklearn.model_selection import StratifiedKFold, train_test_split
 from src.classifiers.logistic_regression import LogisticRegressionClassifier
 from src.classifiers.random_forest import RandomForestTextClassifier
 from src.vectorizer.tfidf import TfidfVectorizerWrapper
+from src.vectorizer.fasttext import FastTextVectorizer
 from src.vectorizer.word2vec import Word2VecVectorizer
 
 
@@ -94,6 +95,7 @@ def main():
     vectorizer_map = {
         "Word2VecVectorizer": Word2VecVectorizer,
         "TfidfVectorizerWrapper": TfidfVectorizerWrapper,
+        "FastTextVectorizer": FastTextVectorizer,
     }
     classifier_map = {
         "RandomForestTextClassifier": RandomForestTextClassifier,
