@@ -20,16 +20,6 @@
       }
     },
     {
-      "name": "bert_pt_cased",
-      "class": "BertVectorizer",
-      "params": {
-        "model_name": "neuralmind/bert-base-portuguese-cased",
-        "max_length": 256,
-        "batch_size": 16,
-        "device": "cpu"
-      }
-    },
-    {
       "name": "fasttext_100d",
       "class": "FastTextVectorizer",
       "params": {
@@ -128,7 +118,10 @@
       "name": "mlp_default",
       "class": "MLPTextClassifier",
       "params": {
-        "hidden_layer_sizes": [128, 64],
+        "hidden_layer_sizes": [
+          128,
+          64
+        ],
         "activation": "relu",
         "solver": "adam",
         "alpha": 0.0001,
