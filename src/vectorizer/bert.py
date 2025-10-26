@@ -1,9 +1,10 @@
-from typing import Iterable, List, Sequence, Union
+from typing import Iterable, List, Sequence, Union, Optional
 
 import numpy as np
 import pandas as pd
 import torch
 from transformers import AutoModel, AutoTokenizer
+import time
 
 
 class BertVectorizer:
@@ -29,11 +30,19 @@ class BertVectorizer:
         max_length: int = 256,
         batch_size: int = 16,
         device: str = "cpu",
+        verbose: bool = False,
+        progress_every: int = 10,
     ) -> None:
         self.model_name = model_name
         self.max_length = max_length
         self.batch_size = batch_size
-        self.device = device
+        # Seleção automática de device se solicitado
+        if device == "auto":
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        else:
+            self.device = device
+        self.verbose = verbose
+        self.progress_every = max(1, int(progress_every))
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.model = AutoModel.from_pretrained(self.model_name)
@@ -69,7 +78,12 @@ class BertVectorizer:
     @torch.no_grad()
     def _embed_batches(self, texts: Sequence[str]) -> np.ndarray:
         outputs: List[np.ndarray] = []
-        for i in range(0, len(texts), self.batch_size):
+        total = len(texts)
+        start_global = time.perf_counter()
+        if self.verbose:
+            print(f"[BERT] Iniciando embedding de {total} textos em batches de {self.batch_size} no device '{self.device}'...")
+
+        for i in range(0, total, self.batch_size):
             batch = texts[i : i + self.batch_size]
             inputs = self.tokenizer(
                 batch,
@@ -93,5 +107,22 @@ class BertVectorizer:
 
             outputs.append(mean_pooled.cpu().numpy())
 
-        return np.vstack(outputs)
+            # Progresso
+            if self.verbose:
+                processed = min(i + self.batch_size, total)
+                if (processed // self.batch_size) % self.progress_every == 0 or processed == total:
+                    elapsed = time.perf_counter() - start_global
+                    rate = processed / elapsed if elapsed > 0 else 0.0
+                    remaining = total - processed
+                    eta = remaining / rate if rate > 0 else float("inf")
+                    pct = (processed / total) * 100 if total else 100.0
+                    eta_str = (
+                        f"{int(eta // 60):02d}:{int(eta % 60):02d}"
+                        if eta != float("inf")
+                        else "--:--"
+                    )
+                    print(
+                        f"[BERT] {processed}/{total} ({pct:.1f}%) | {elapsed:.1f}s passados | ETA ~ {eta_str}"
+                    )
 
+        return np.vstack(outputs)

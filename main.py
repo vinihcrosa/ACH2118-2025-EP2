@@ -1,5 +1,7 @@
 import json
 import time
+import os
+import signal
 from pathlib import Path
 
 import numpy as np
@@ -42,6 +44,28 @@ def _mean_std(values):
     else:
         std = 0.0
     return mean, std
+
+
+# Suporte a interrupção com Ctrl+C salvando resultados parciais
+GLOBAL_RESULTS = []
+
+
+def _sigint_handler(signum, frame):
+    try:
+        print("\nInterrompido (Ctrl+C). Salvando resultados parciais...", flush=True)
+        results_dir = Path("results")
+        results_dir.mkdir(exist_ok=True)
+        partial_path = results_dir / "pipeline_results_partial.csv"
+        pd.DataFrame(GLOBAL_RESULTS).to_csv(partial_path, index=False)
+        print(f"Parcial salvo em {partial_path.resolve()}", flush=True)
+    except Exception as e:
+        print(f"Falha ao salvar parcial: {e}", flush=True)
+    finally:
+        # Saída imediata para evitar ficar preso em operações longas
+        os._exit(130)
+
+
+signal.signal(signal.SIGINT, _sigint_handler)
 
 
 def main():
@@ -109,6 +133,9 @@ def main():
     }
 
     results = []
+    # Atualiza referência global para salvar parcial em caso de Ctrl+C
+    global GLOBAL_RESULTS
+    GLOBAL_RESULTS = results
     for vec_cfg in config.get("vectorizers", []):
         vec_name = vec_cfg.get("name", vec_cfg.get("class"))
         vec_class_name = vec_cfg.get("class")
