@@ -9,4 +9,6 @@ dependencies = [
     "numpy",
     "scikit-learn",
     "gensim",
+    "transformers",
+    "torch",
 ]

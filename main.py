@@ -12,6 +12,7 @@ from src.classifiers.random_forest import RandomForestTextClassifier
 from src.vectorizer.tfidf import TfidfVectorizerWrapper
 from src.vectorizer.fasttext import FastTextVectorizer
 from src.vectorizer.word2vec import Word2VecVectorizer
+from src.vectorizer.bert import BertVectorizer
 
 
 def _normalize_params(params):
@@ -96,6 +97,7 @@ def main():
         "Word2VecVectorizer": Word2VecVectorizer,
         "TfidfVectorizerWrapper": TfidfVectorizerWrapper,
         "FastTextVectorizer": FastTextVectorizer,
+        "BertVectorizer": BertVectorizer,
     }
     classifier_map = {
         "RandomForestTextClassifier": RandomForestTextClassifier,
