@@ -9,7 +9,7 @@
   },
   "vectorizers": [
     {
-      "name": "word2vec_default",
+      "name": "word2vec_100d",
       "class": "Word2VecVectorizer",
       "params": {
         "vector_size": 100,
@@ -20,11 +20,48 @@
       }
     },
     {
-      "name": "tfidf_default",
+      "name": "word2vec_200d",
+      "class": "Word2VecVectorizer",
+      "params": {
+        "vector_size": 200,
+        "window": 5,
+        "min_count": 2,
+        "workers": 4,
+        "epochs": 50
+      }
+    },
+    {
+      "name": "word2vec_500d",
+      "class": "Word2VecVectorizer",
+      "params": {
+        "vector_size": 500,
+        "window": 5,
+        "min_count": 2,
+        "workers": 4,
+        "epochs": 50
+      }
+    },
+    {
+      "name": "tfidf_1-2grams",
       "class": "TfidfVectorizerWrapper",
       "params": {
         "max_features": 5000,
-        "ngram_range": [1, 2],
+        "ngram_range": [
+          1,
+          2
+        ],
+        "min_df": 2
+      }
+    },
+    {
+      "name": "tfidf_1-5grams",
+      "class": "TfidfVectorizerWrapper",
+      "params": {
+        "max_features": 5000,
+        "ngram_range": [
+          1,
+          5
+        ],
         "min_df": 2
       }
     }
