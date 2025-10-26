@@ -9,6 +9,7 @@ from sklearn.model_selection import StratifiedKFold, train_test_split
 
 from src.classifiers.logistic_regression import LogisticRegressionClassifier
 from src.classifiers.random_forest import RandomForestTextClassifier
+from src.classifiers.mlp import MLPTextClassifier
 from src.vectorizer.tfidf import TfidfVectorizerWrapper
 from src.vectorizer.fasttext import FastTextVectorizer
 from src.vectorizer.word2vec import Word2VecVectorizer
@@ -16,7 +17,7 @@ from src.vectorizer.bert import BertVectorizer
 
 
 def _normalize_params(params):
-    tuple_keys = {"ngram_range"}
+    tuple_keys = {"ngram_range", "hidden_layer_sizes"}
     normalized = {}
     for key, value in params.items():
         if key in tuple_keys and isinstance(value, list):
@@ -102,6 +103,7 @@ def main():
     classifier_map = {
         "RandomForestTextClassifier": RandomForestTextClassifier,
         "LogisticRegressionClassifier": LogisticRegressionClassifier,
+        "MLPTextClassifier": MLPTextClassifier,
     }
 
     results = []
