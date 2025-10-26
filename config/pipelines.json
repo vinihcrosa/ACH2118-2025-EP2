@@ -51,5 +51,16 @@
         "verbose": 1
       }
     }
-  ]
+  ],
+  "evaluation": {
+    "holdout": {
+      "enabled": true
+    },
+    "cross_validation": {
+      "enabled": true,
+      "folds": 5,
+      "shuffle": true,
+      "random_state": 42
+    }
+  }
 }
