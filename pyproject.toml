@@ -11,4 +11,5 @@ dependencies = [
     "gensim",
     "transformers",
     "torch",
+    "xgboost",
 ]
