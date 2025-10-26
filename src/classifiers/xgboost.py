@@ -2,6 +2,7 @@ from typing import Any, Iterable, Union
 
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 from xgboost import XGBClassifier
 
 
@@ -28,19 +29,35 @@ class XGBoostTextClassifier:
             "tree_method": "hist",
             "eval_metric": "logloss",
         }
-        params = {**defaults, **model_kwargs}
-        self.model = XGBClassifier(**params)
-
         features = self._to_ndarray(x)
         labels = self._to_1d_array(y)
 
-        self.model.fit(features, labels)
+        # Sempre codifica os rótulos para inteiros para evitar erros do XGBoost
+        self.label_encoder = LabelEncoder()
+        y_enc = self.label_encoder.fit_transform(labels)
+        n_classes = len(self.label_encoder.classes_)
+
+        params = {**defaults, **model_kwargs}
+        if "objective" not in model_kwargs:
+            if n_classes > 2:
+                params["objective"] = "multi:softprob"
+                params["num_class"] = n_classes
+            else:
+                params["objective"] = "binary:logistic"
+
+        self.model = XGBClassifier(**params)
+        self.model.fit(features, y_enc)
 
     def predict(
         self, x_test: Union[np.ndarray, pd.DataFrame, Iterable[Iterable[Any]]]
     ) -> np.ndarray:
         features = self._to_ndarray(x_test)
-        return self.model.predict(features)
+        y_pred = self.model.predict(features)
+        # Garantir inteiros antes de decodificar
+        if isinstance(y_pred, np.ndarray) and y_pred.dtype.kind == "f":
+            # Para binário pode vir como 0.0/1.0
+            y_pred = y_pred.astype(int)
+        return self.label_encoder.inverse_transform(y_pred)
 
     @staticmethod
     def _to_ndarray(data: Union[np.ndarray, pd.DataFrame, Iterable]) -> np.ndarray:
@@ -57,4 +74,3 @@ class XGBoostTextClassifier:
         if isinstance(data, np.ndarray):
             return data.ravel()
         return np.asarray(list(data)).ravel()
-
