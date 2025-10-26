@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 
 import pandas as pd
 
-from src.classifiers.logistic_regression import LogisticRegressionClassifier
+from src.classifiers.random_forest import RandomForestTextClassifier
 from src.vectorizer.word2vec import Word2VecVectorizer
 
 
@@ -37,9 +37,15 @@ def main():
     print("Vetorizando textos de teste...")
     X_test = vectorizer.transform(X_test_texts)
 
-    print("Treinando regressão logística...")
-    classifier = LogisticRegressionClassifier(
-        X_train, y_train, max_iter=1000, solver="liblinear", multi_class="ovr", verbose=1
+    print("Treinando Random Forest...")
+    classifier = RandomForestTextClassifier(
+        X_train,
+        y_train,
+        n_estimators=200,
+        max_depth=None,
+        n_jobs=-1,
+        random_state=42,
+        verbose=1,
     )
     print("Gerando previsões...")
     y_pred = classifier.predict(X_test)
