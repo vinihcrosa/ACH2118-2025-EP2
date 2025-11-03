@@ -1,0 +1,11 @@
+{
+  "models": [
+    {
+      "name": "tfidf12_3k_xgb",
+      "accuracy": 0.6591117216117216
+    }
+  ],
+  "ensemble_accuracy": 0.6591117216117216,
+  "n_train": 30574,
+  "n_test": 13104
+}

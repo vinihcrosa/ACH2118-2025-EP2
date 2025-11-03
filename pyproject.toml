@@ -12,4 +12,6 @@ dependencies = [
     "transformers",
     "torch",
     "xgboost",
+    "matplotlib>=3.10.7",
+    "nltk>=3.9.2",
 ]

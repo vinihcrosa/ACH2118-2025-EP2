@@ -3,23 +3,53 @@ from typing import Iterable, List, Optional, Sequence, Union
 import numpy as np
 import pandas as pd
 from gensim.models import Word2Vec
+from sklearn.base import BaseEstimator, TransformerMixin
 
 
-class Word2VecVectorizer:
+class Word2VecVectorizer(BaseEstimator, TransformerMixin):
     """
     Envolve um modelo Word2Vec do gensim e gera vetores médios para cada documento.
 
+    Compatível com scikit-learn (BaseEstimator/TransformerMixin), permitindo uso em
+    Pipelines, GridSearch e ensembles (Voting/Stacking/Bagging).
+
     Parameters
     ----------
-    vector_size : int
+    vector_size : int, default=100
         Tamanho dos vetores gerados pelo modelo.
-    **model_kwargs : dict
-        Parâmetros adicionais para `gensim.models.Word2Vec`.
+    window : int, default=5
+        Tamanho da janela de contexto do Word2Vec.
+    min_count : int, default=1
+        Frequência mínima de uma palavra para ser considerada.
+    sg : int, default=1
+        Arquitetura do Word2Vec (1=Skip-gram, 0=CBOW).
+    workers : int, default=1
+        Número de threads para treinamento.
+    epochs : int, default=5
+        Número de épocas de treinamento.
+    seed : int, default=10
+        Semente para reprodutibilidade.
     """
 
-    def __init__(self, vector_size: int = 100, **model_kwargs):
-        self.model_kwargs = model_kwargs
+    def __init__(
+        self,
+        vector_size: int = 100,
+        window: int = 5,
+        min_count: int = 1,
+        sg: int = 1,
+        workers: int = 1,
+        epochs: int = 5,
+        seed: int = 10,
+    ):
+        # Hiperparâmetros expostos para cloneabilidade pelo sklearn
         self.vector_size = vector_size
+        self.window = window
+        self.min_count = min_count
+        self.sg = sg
+        self.workers = workers
+        self.epochs = epochs
+        self.seed = seed
+        # Estado treinado
         self.model: Optional[Word2Vec] = None
 
     def fit(
@@ -27,7 +57,14 @@ class Word2VecVectorizer:
     ) -> "Word2VecVectorizer":
         tokenized_corpus = self._prepare_corpus(texts)
         self.model = Word2Vec(
-            sentences=tokenized_corpus, vector_size=self.vector_size, **self.model_kwargs
+            sentences=tokenized_corpus,
+            vector_size=self.vector_size,
+            window=self.window,
+            min_count=self.min_count,
+            sg=self.sg,
+            workers=self.workers,
+            epochs=self.epochs,
+            seed=self.seed,
         )
         return self
 
